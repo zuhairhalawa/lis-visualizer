@@ -309,17 +309,18 @@
       box-shadow: none;
     }
 
-    .b-build { background: linear-gradient(135deg, #4f7cff, #2563eb); }
-    .b-step { background: linear-gradient(135deg, #10b981, #059669); }
-    .b-play { background: linear-gradient(135deg, #f59e0b, #d97706); }
-    .b-pause { background: linear-gradient(135deg, #ef4444, #dc2626); }
+    /* Every gradient stop keeps at least 4.5:1 contrast with its label (WCAG AA). */
+    .b-build { background: linear-gradient(135deg, #3367ff, #2563eb); }
+    .b-step { background: linear-gradient(135deg, #0c855d, #04855d); }
+    .b-play { background: linear-gradient(135deg, #f59e0b, #d97706); color: #1b1300; }
+    .b-pause { background: linear-gradient(135deg, #e71414, #dc2626); }
     .b-reset { background: linear-gradient(135deg, #6b7280, #4b5563); }
-    .b-rand { background: linear-gradient(135deg, #8b5cf6, #7c3aed); }
-    .b-export { background: linear-gradient(135deg, #14b8a6, #0f766e); }
-    .b-preset1 { background: linear-gradient(135deg, #5b7cff, #7c4dff); }
-    .b-preset2 { background: linear-gradient(135deg, #0ea5e9, #2563eb); }
-    .b-preset3 { background: linear-gradient(135deg, #14b8a6, #0f766e); }
-    .b-preset4 { background: linear-gradient(135deg, #ec4899, #db2777); }
+    .b-rand { background: linear-gradient(135deg, #8452f5, #7c3aed); }
+    .b-export { background: linear-gradient(135deg, #0e8376, #0f766e); }
+    .b-preset1 { background: linear-gradient(135deg, #3f66ff, #7c4dff); }
+    .b-preset2 { background: linear-gradient(135deg, #0b7caf, #2563eb); }
+    .b-preset3 { background: linear-gradient(135deg, #0e8376, #0f766e); }
+    .b-preset4 { background: linear-gradient(135deg, #dd1779, #db2576); }
 
     .switch-row {
       display: flex;
@@ -1037,6 +1038,24 @@
       .hero h1 { font-size: 24px; }
       svg { height: 390px; }
     }
+
+    :root { --focus: #5fe4ff; }
+    body.light { --focus: #3347d4; }
+
+    :focus-visible,
+    input[type="text"]:focus-visible,
+    select:focus-visible {
+      outline: 2px solid var(--focus);
+      outline-offset: 2px;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
   </style>
 </head>
 <body>
@@ -1053,7 +1072,7 @@
               <p>A polished single-file playground for Longest Increasing Subsequence with cinematic visuals, smarter insights, reconstructed answer tracking, and presentation-ready interaction.</p>
             </div>
           </div>
-          <button class="icon-btn" id="themeBtn" title="Toggle theme">🌙</button>
+          <button class="icon-btn" id="themeBtn" type="button" title="Toggle theme" aria-label="Switch to light theme">🌙</button>
         </div>
         <div class="hero-chips">
           <div class="chip">Single-file</div>
@@ -1070,12 +1089,12 @@
           <option value="bs">Binary Search / Patience · O(n log n)</option>
         </select>
         <div class="switch-row">
-          <span>Show reconstructed LIS</span>
-          <div class="switch active" id="lisSwitch"></div>
+          <span id="lisSwitchLabel">Show reconstructed LIS</span>
+          <div class="switch active" id="lisSwitch" role="switch" tabindex="0" aria-checked="true" aria-labelledby="lisSwitchLabel"></div>
         </div>
         <div class="switch-row">
-          <span>Glow animations</span>
-          <div class="switch active" id="glowSwitch"></div>
+          <span id="glowSwitchLabel">Glow animations</span>
+          <div class="switch active" id="glowSwitch" role="switch" tabindex="0" aria-checked="true" aria-labelledby="glowSwitchLabel"></div>
         </div>
       </div>
 
@@ -1085,8 +1104,8 @@
       </div>
 
       <div class="panel">
-        <label class="label">Presets</label>
-        <div class="grid-4">
+        <div class="label" id="presetsLabel">Presets</div>
+        <div class="grid-4" role="group" aria-labelledby="presetsLabel">
           <button class="action b-preset1" id="preset1">Classic</button>
           <button class="action b-preset2" id="preset2">Mixed</button>
           <button class="action b-preset3" id="preset3">Flat</button>
@@ -1095,8 +1114,8 @@
       </div>
 
       <div class="panel">
-        <label class="label">Controls</label>
-        <div class="grid-3">
+        <div class="label" id="controlsLabel">Controls</div>
+        <div class="grid-3" role="group" aria-labelledby="controlsLabel">
           <button class="action b-build" id="buildBtn">Build Steps</button>
           <button class="action b-step" id="stepBtn" disabled>Step</button>
           <button class="action b-play" id="playBtn" disabled>Play</button>
@@ -1107,8 +1126,8 @@
       </div>
 
       <div class="panel">
-        <label class="label">Tools</label>
-        <div class="grid-2">
+        <div class="label" id="toolsLabel">Tools</div>
+        <div class="grid-2" role="group" aria-labelledby="toolsLabel">
           <button class="action b-export" id="shareBtn">Copy State</button>
           <button class="action b-export" id="pngBtn">Save SVG</button>
         </div>
@@ -1119,10 +1138,10 @@
       </div>
 
       <div class="panel">
-        <label class="label">Animation Speed</label>
+        <label class="label" for="speedSlider">Animation Speed</label>
         <div class="slider-wrap">
           <span>Slow</span>
-          <input type="range" id="speedSlider" min="0.25" max="4" step="0.25" value="1" />
+          <input type="range" id="speedSlider" min="0.25" max="4" step="0.25" value="1" aria-valuetext="1x" />
           <strong id="speedText">1x</strong>
         </div>
       </div>
@@ -1162,7 +1181,7 @@
               <div class="badge" id="arrayBadge">n = 8</div>
             </div>
           </div>
-          <div id="messageBox">Enter numbers, press Build, and step through the algorithm.</div>
+          <div id="messageBox" role="status" aria-live="polite" aria-atomic="true">Enter numbers, press Build, and step through the algorithm.</div>
         </section>
 
         <section class="mini-card">
@@ -1485,6 +1504,7 @@
       state.theme = theme;
       document.body.classList.toggle('light', theme === 'light');
       themeBtn.textContent = theme === 'light' ? '☀️' : '🌙';
+      themeBtn.setAttribute('aria-label', theme === 'light' ? 'Switch to dark theme' : 'Switch to light theme');
       localStorage.setItem('lis-ultra-theme', theme);
       renderGrowthChart();
     }
@@ -1492,6 +1512,7 @@
     function toggleSwitch(el, key) {
       state[key] = !state[key];
       el.classList.toggle('active', state[key]);
+      el.setAttribute('aria-checked', String(state[key]));
       if (key === 'glow') renderFrame(current);
       if (key === 'showLIS') {
         updateReconBadge();
@@ -1854,6 +1875,7 @@
         block.className = 'timeline-step';
         block.style.height = `${42 + (index % 5) * 11}px`;
         block.innerHTML = `<span>${index}</span>`;
+        block.setAttribute('aria-label', `Jump to step ${index}`);
         block.onclick = () => {
           clearPlayback();
           renderFrame(index);
@@ -2417,6 +2439,7 @@
 
     speedSlider.oninput = () => {
       speedText.textContent = `${speedSlider.value}x`;
+      speedSlider.setAttribute('aria-valuetext', `${speedSlider.value}x`);
     };
 
     growthN.oninput = renderGrowthChart;
@@ -2438,9 +2461,22 @@
     lisSwitch.onclick = () => toggleSwitch(lisSwitch, 'showLIS');
     glowSwitch.onclick = () => toggleSwitch(glowSwitch, 'glow');
 
+    [lisSwitch, glowSwitch].forEach((el) => {
+      el.addEventListener('keydown', (event) => {
+        if (event.key === ' ' || event.key === 'Enter') {
+          event.preventDefault();
+          el.click();
+        }
+      });
+    });
+
     document.addEventListener('keydown', (event) => {
-      if (event.target.tagName === 'INPUT') return;
+      // Leave browser shortcuts (Ctrl/Cmd+R, ...) alone and keep typing in form fields working.
+      if (event.ctrlKey || event.metaKey || event.altKey) return;
+      if (event.target.closest('input, select, textarea')) return;
       if (event.code === 'Space') {
+        // Space must still activate a focused button or switch instead of toggling playback.
+        if (event.target.closest('button, [role="switch"]')) return;
         event.preventDefault();
         if (timer) pause();
         else play();
